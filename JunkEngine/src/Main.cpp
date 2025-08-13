@@ -109,12 +109,21 @@ int main(int argc, char* argv[]) {
 	shader.load("vertexTest.shader", "fragmentTest.shader");
 	shader.use();
 
+	int shaderProgram = shader.getShaderProgram();
+	int xOffsetLocation = glGetUniformLocation(shaderProgram, "xOffset");
+	float xOffset = -1, tk=glfwGetTime();
 
 	// Loop!
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window);
 		glClear(GL_COLOR_BUFFER_BIT);
+
+		if (glfwGetTime() - tk > 0.01) {
+			xOffset += 0.005;
+			tk = glfwGetTime();
+		}
+		glUniform1f(xOffsetLocation, xOffset);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 		glfwSwapBuffers(window);

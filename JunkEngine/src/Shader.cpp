@@ -21,10 +21,10 @@ void Shader::load(const char* vertexShaderFilename, const char* fragmentShaderFi
 
 	vertexShaderSourceStream.close();
 	
-	for (int i = 0; i < fileContents.size(); i++) {
-		putchar(fileContents.at(i));
-	}
-	putchar('*');
+	//for (int i = 0; i < fileContents.size(); i++) {
+	//	putchar(fileContents.at(i));
+	//}
+	//putchar('*');
 	
 	const char* vertexShaderSource = fileContents.c_str();
 	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -44,10 +44,10 @@ void Shader::load(const char* vertexShaderFilename, const char* fragmentShaderFi
 
 	fragmentShaderSourceStream.close();
 
-	for (int i = 0; i < fileContents.size(); i++) {
-		putchar(fileContents.at(i));
-	}
-	putchar('*');
+	//for (int i = 0; i < fileContents.size(); i++) {
+	//	putchar(fileContents.at(i));
+	//}
+	//putchar('*');
 
 	const char* fragmentShaderSource = fileContents.c_str();
 	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -97,4 +97,8 @@ void Shader::shaderProgramErrorCheck(unsigned int shader, const char* shaderName
 
 void Shader::use() {
 	glUseProgram(shaderProgram);
+}
+
+unsigned int Shader::getShaderProgram() {
+	return shaderProgram;
 }
