@@ -8,7 +8,7 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 //void checkForShaderErrors(unsigned int shader, const char* shaderName);
-void checkForShaderProgramErrors(unsigned int shaderProgram, const char* shaderProgramName = "");
+//void checkForShaderProgramErrors(unsigned int shaderProgram, const char* shaderProgramName = "");
 
 const char* vertexShaderSource =	"#version 330 core\n"
 									"layout (location = 0) in vec3 aPos;\n"
@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	
-	GLFWwindow* window = glfwCreateWindow(800, 600, "Kwame is great!", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(800, 800, "Kwame is great!", NULL, NULL);
 
 	if (window == NULL)
 	{
@@ -53,45 +53,24 @@ int main(int argc, char* argv[]) {
 		return -1;
 	}
 
-	glViewport(10, 10, 800-20, 600-20);
+	glViewport(10, 10, 800, 800);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	//glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
 	float vertices[] = {
 		// positions         // colors
-		 0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
-		-0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
-		 0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top 
+		 -1, -1, 0.0f,  1.0f, 0.0f, 0.0f,   
+		 -1, 1, 0.0f,  0.0f, 1.0f, 0.0f,   
+		 1,  1, 0.0f,  0.0f, 0.0f, 1.0f,
+		 1,  -1, 0.0f,  0.0f, 1.0f, 1.0f    
 	};
-
 
 	unsigned int VBO;
 	glGenBuffers(1, &VBO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	//unsigned int vertexShader;
-	//vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	//glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	//glCompileShader(vertexShader);
-	//checkForShaderErrors(vertexShader, "vertexShader");
-
-	//unsigned int fragmentShader;
-	//fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	//glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	//glCompileShader(fragmentShader);
-	//checkForShaderErrors(fragmentShader, "fragmentShader");
-
-	//unsigned int shaderProgram;
-	//shaderProgram = glCreateProgram();
-	//glAttachShader(shaderProgram, vertexShader);
-	//glAttachShader(shaderProgram, fragmentShader);
-	//glLinkProgram(shaderProgram);
-	//glDeleteShader(vertexShader);
-	//glDeleteShader(fragmentShader);
-	//checkForShaderProgramErrors(shaderProgram, "shaderProgram");
 
 	unsigned int VAO;
 	glGenVertexArrays(1, &VAO);
@@ -106,12 +85,12 @@ int main(int argc, char* argv[]) {
 	glEnableVertexAttribArray(1);
 
 	//glUseProgram(shaderProgram);
-	shader.load("vertexTest.shader", "fragmentTest.shader");
+	shader.load("vertexTest.shader", "mandelbrot.shader");
 	shader.use();
 
 	int shaderProgram = shader.getShaderProgram();
-	int xOffsetLocation = glGetUniformLocation(shaderProgram, "xOffset");
-	float xOffset = -1, tk=glfwGetTime();
+	//int xOffsetLocation = glGetUniformLocation(shaderProgram, "xOffset");
+	//float xOffset = -1, tk=glfwGetTime();
 
 	// Loop!
 	while (!glfwWindowShouldClose(window))
@@ -119,12 +98,12 @@ int main(int argc, char* argv[]) {
 		processInput(window);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		if (glfwGetTime() - tk > 0.01) {
-			xOffset += 0.005;
-			tk = glfwGetTime();
-		}
-		glUniform1f(xOffsetLocation, xOffset);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		//if (glfwGetTime() - tk > 0.01) {
+		//	xOffset += 0.005;
+		//	tk = glfwGetTime();
+		//}
+		//glUniform1f(xOffsetLocation, xOffset);
+		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -134,7 +113,6 @@ int main(int argc, char* argv[]) {
 	glfwTerminate();
 	return 0;
 }
-
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -147,32 +125,3 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 }
-
-//void checkForShaderErrors(unsigned int shader, const char* shaderName) {
-//	int success;
-//	char infoLog[512];
-//	glGetShaderiv(shader, GL_LINK_STATUS, &success);
-//
-//	if (!success)
-//	{
-//		glGetShaderInfoLog(shader, 512, NULL, infoLog);
-//		std::cout << shaderName << ": ERROR::SHADER::COMPILATION_FAILED\n" << infoLog << std::endl;
-//
-//		exit(-3);
-//	}
-//}
-//
-//void checkForShaderProgramErrors(unsigned int shaderProgram, const char* shaderProgramName) {
-//	int success;
-//	char infoLog[512];
-//	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-//
-//	if (!success)
-//	{
-//		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-//		std::cout << shaderProgramName << ": ERROR::SHADER::LINK_FAILED\n" << infoLog << std::endl;
-//
-//		exit(-3);
-//	}
-//}
-
