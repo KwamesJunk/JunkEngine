@@ -99,6 +99,6 @@ void Shader::use() {
 	glUseProgram(shaderProgram);
 }
 
-unsigned int Shader::getShaderProgram() {
+unsigned int Shader::getShaderID() {
 	return shaderProgram;
 }

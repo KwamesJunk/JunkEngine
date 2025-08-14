@@ -9,5 +9,5 @@ private:
 public:
 	void load(const char* vertexShaderFilename, const char* fragmentShaderFilename);
 	void use();
-	unsigned int getShaderProgram();
+	unsigned int getShaderID();
 };

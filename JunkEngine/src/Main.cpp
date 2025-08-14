@@ -47,6 +47,10 @@ int main(int argc, char* argv[]) {
 		  0.75,  0.75, 0.0,		0.0, 0.0, 1.0,		2.0, 2.0,	// top-right
 		  0.75, -0.75, 0.0,		0.0, 1.0, 1.0,		2.0, 0.0,	// bottom-right
 	};
+	unsigned int indices[] = {
+	   0, 1, 3, // first triangle
+	   1, 2, 3  // second triangle
+	};
 
 	// load texture
 	int width, height, numChannels;
@@ -59,9 +63,9 @@ int main(int argc, char* argv[]) {
 	}
 	printf("Width: %d Height: %d Num Channels: %d\n", width, height, numChannels);
 
-	unsigned int texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	unsigned int texture1;
+	glGenTextures(1, &texture1);
+	glBindTexture(GL_TEXTURE_2D, texture1);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -69,6 +73,25 @@ int main(int argc, char* argv[]) {
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	stbi_image_free(textureData);
+
+	unsigned char* textureData2 = stbi_load("Netscape.png", &width, &height, &numChannels, 0);
+
+	if (!textureData2) {
+		printf("Oh no! Couldn't load texture file!\n");
+		return -3;
+	}
+	printf("Width: %d Height: %d Num Channels: %d\n", width, height, numChannels);
+
+	unsigned int texture2;
+	glGenTextures(1, &texture2);
+	glBindTexture(GL_TEXTURE_2D, texture2);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData2);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	stbi_image_free(textureData2);
 
 	unsigned int VBO;
 	glGenBuffers(1, &VBO);
@@ -94,6 +117,14 @@ int main(int argc, char* argv[]) {
 
 	shader.load("vertexTest.shader", "texture.fshader");
 	shader.use();
+
+	glUniform1i(glGetUniformLocation(shader.getShaderID(), "texture1"), 0);
+	glUniform1i(glGetUniformLocation(shader.getShaderID(), "texture2"), 1);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, texture2);
 
 	// Loop!
 	while (!glfwWindowShouldClose(window))
