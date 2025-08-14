@@ -3,30 +3,11 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include "Shader.h"
+#include "stb_image.h"
 
 // Prototypes
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
-//void checkForShaderErrors(unsigned int shader, const char* shaderName);
-//void checkForShaderProgramErrors(unsigned int shaderProgram, const char* shaderProgramName = "");
-
-const char* vertexShaderSource =	"#version 330 core\n"
-									"layout (location = 0) in vec3 aPos;\n"
-									"layout (location = 1) in vec3 inColour;\n"
-									"out vec3 vertexColour;\n"
-									"void main()\n"
-									"{\n"
-									"   gl_Position = vec4(aPos, 1.0);\n"
-									"   vertexColour = inColour;\n"
-									"}\0";
-
-const char* fragmentShaderSource = "#version 330 core\n"
-									"out vec4 FragColour;\n"
-									"in vec3 vertexColour;\n"
-									"void main()\n"
-									"{\n"
-									"	FragColour = vec4(vertexColour, 1);\n"
-									"}\0";
 
 int main(int argc, char* argv[]) {
 	Shader shader;
@@ -53,18 +34,41 @@ int main(int argc, char* argv[]) {
 		return -1;
 	}
 
-	glViewport(10, 10, 800, 800);
+	glViewport(0, 0, 800, 800);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-	//glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
-	float vertices[] = {
-		// positions         // colors
-		 -1, -1, 0.0f,  1.0f, 0.0f, 0.0f,   
-		 -1, 1, 0.0f,  0.0f, 1.0f, 0.0f,   
-		 1,  1, 0.0f,  0.0f, 0.0f, 1.0f,
-		 1,  -1, 0.0f,  0.0f, 1.0f, 1.0f    
+	// Vertex data
+	float vertices[] = {							// texture
+		// world positions		// colours			// co-ordinates
+		 -0.75, -0.75, 0.0,		1.0, 0.0, 0.0,		0.0, 0.0,	// bottom-left
+		 -0.75,  0.75, 0.0,		0.0, 1.0, 0.0,		0.0, 2.0,	// top-left
+		  0.75,  0.75, 0.0,		0.0, 0.0, 1.0,		2.0, 2.0,	// top-right
+		  0.75, -0.75, 0.0,		0.0, 1.0, 1.0,		2.0, 0.0,	// bottom-right
 	};
+
+	// load texture
+	int width, height, numChannels;
+	stbi_set_flip_vertically_on_load(true);
+	unsigned char* textureData = stbi_load("face.png", &width, &height, &numChannels, 0);
+
+	if (!textureData) {
+		printf("Oh no! Couldn't load texture file!\n");
+		return -3;
+	}
+	printf("Width: %d Height: %d Num Channels: %d\n", width, height, numChannels);
+
+	unsigned int texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	stbi_image_free(textureData);
 
 	unsigned int VBO;
 	glGenBuffers(1, &VBO);
@@ -77,20 +81,19 @@ int main(int argc, char* argv[]) {
 	glBindVertexArray(VAO);
 
 	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 	
-	// color attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	// colour attribute
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
-	//glUseProgram(shaderProgram);
-	shader.load("vertexTest.shader", "mandelbrot.shader");
-	shader.use();
+	// texture co-ordinate attribute
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
-	int shaderProgram = shader.getShaderProgram();
-	//int xOffsetLocation = glGetUniformLocation(shaderProgram, "xOffset");
-	//float xOffset = -1, tk=glfwGetTime();
+	shader.load("vertexTest.shader", "texture.fshader");
+	shader.use();
 
 	// Loop!
 	while (!glfwWindowShouldClose(window))
@@ -98,11 +101,6 @@ int main(int argc, char* argv[]) {
 		processInput(window);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		//if (glfwGetTime() - tk > 0.01) {
-		//	xOffset += 0.005;
-		//	tk = glfwGetTime();
-		//}
-		//glUniform1f(xOffsetLocation, xOffset);
 		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
 		glfwSwapBuffers(window);
