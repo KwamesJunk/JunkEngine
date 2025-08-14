@@ -10,4 +10,5 @@ public:
 	void load(const char* vertexShaderFilename, const char* fragmentShaderFilename);
 	void use();
 	unsigned int getShaderID();
+	void setFloat(const char* uniformName, float value);
 };

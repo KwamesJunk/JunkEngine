@@ -102,3 +102,7 @@ void Shader::use() {
 unsigned int Shader::getShaderID() {
 	return shaderProgram;
 }
+
+void Shader::setFloat(const char* uniformName, float value) {
+	glUniform1f(glGetUniformLocation(shaderProgram, uniformName), value);
+}

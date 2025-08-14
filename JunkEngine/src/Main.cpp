@@ -9,6 +9,8 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 
+static const float PI = 3.1415962;
+
 int main(int argc, char* argv[]) {
 	Shader shader;
 	
@@ -126,12 +128,15 @@ int main(int argc, char* argv[]) {
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, texture2);
 
+	float startTime = glfwGetTime();
+
 	// Loop!
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window);
 		glClear(GL_COLOR_BUFFER_BIT);
-
+		
+		shader.setFloat("mixAmount", sin((glfwGetTime() - startTime) * PI / 2) / 2 + 0.5);
 		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
 		glfwSwapBuffers(window);
