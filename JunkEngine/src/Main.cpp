@@ -4,6 +4,9 @@
 #include <iostream>
 #include "Shader.h"
 #include "stb_image.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 // Prototypes
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -14,6 +17,7 @@ static const float PI = 3.1415962;
 int main(int argc, char* argv[]) {
 	Shader shader;
 	
+
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -72,7 +76,7 @@ int main(int argc, char* argv[]) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, numChannels == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, textureData);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	stbi_image_free(textureData);
 
@@ -117,7 +121,7 @@ int main(int argc, char* argv[]) {
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 
-	shader.load("vertexTest.shader", "texture.fshader");
+	shader.load("transform.vshader", "texture.fshader");
 	shader.use();
 
 	glUniform1i(glGetUniformLocation(shader.getShaderID(), "texture1"), 0);
@@ -128,15 +132,25 @@ int main(int argc, char* argv[]) {
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, texture2);
 
+	// Matrix stuff
+	glm::mat4 identity = glm::mat4(1);
+	glm::mat4 trans;
+	//trans = glm::rotate(identity, glm::radians(45.0f), glm::vec3(0.0, 0.0, 1.0));
+	unsigned int transformLoc = glGetUniformLocation(shader.getShaderID(), "transform");
+	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+
 	float startTime = glfwGetTime();
 
 	// Loop!
 	while (!glfwWindowShouldClose(window))
 	{
+		float elapsedTime = glfwGetTime() - startTime;
 		processInput(window);
 		glClear(GL_COLOR_BUFFER_BIT);
 		
-		shader.setFloat("mixAmount", sin((glfwGetTime() - startTime) * PI / 2) / 2 + 0.5);
+		trans = glm::rotate(identity, glm::radians(90 * elapsedTime*1.5f), glm::vec3(0.0, 1.0, 1.0));
+		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+		shader.setFloat("mixAmount", sin(elapsedTime * PI / 2) / 2 + 0.5);
 		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
 		glfwSwapBuffers(window);
