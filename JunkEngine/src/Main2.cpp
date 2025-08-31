@@ -118,41 +118,58 @@ int main2(int argc, char* argv[]) {
 	float sin72 = 0.9510, sin144 = 0.5878, sin216 = -0.5878, sin288 = -0.9510;
 	float cos72 = 0.3090, cos144 = -0.8090, cos216 = -0.8090, cos288 = 0.3090;
 	float icosahedron[] = {
-		// Fan
-		  -g,  1.0,  0.0, 1.0, 1.0, 1.0, 0.5, 0.5, // F
-		 0.0,    g, -1.0, 1.0, 1.0, 1.0, (sin324 + 1) / 2, (cos324 + 1) / 2, // A
-		 0.0,    g,  1.0, 1.0, 1.0, 1.0, (sin36 + 1) / 2, (cos36 + 1) / 2, // B
-		-1.0,  0.0,    g, 1.0, 1.0, 1.0, (sin108 + 1) / 2, (cos108 + 1) / 2, // C
-		  -g, -1.0,  0.0, 1.0, 1.0, 1.0, 0.5, 0.0, // D
-		-1.0,  0.0,   -g, 1.0, 1.0, 1.0, (sin252 + 1) / 2, (cos252 + 1) / 2, // E
-		 0.0,    g, -1.0, 1.0, 1.0, 1.0, (sin324 + 1) / 2, (cos324 + 1) / 2, // A
+		//// Fan
+		//  -g,  1.0,  0.0, 1.0, 1.0, 1.0, 0.5, 0.5, // F5
+		// 0.0,    g, -1.0, 1.0, 1.0, 1.0, (sin324 + 1) / 2, (cos324 + 1) / 2, // A0
+		// 0.0,    g,  1.0, 1.0, 1.0, 1.0, (sin36 + 1) / 2, (cos36 + 1) / 2, // B1
+		//-1.0,  0.0,    g, 1.0, 1.0, 1.0, (sin108 + 1) / 2, (cos108 + 1) / 2, // C2
+		//  -g, -1.0,  0.0, 1.0, 1.0, 1.0, 0.5, 0.0, // D3
+		//-1.0,  0.0,   -g, 1.0, 1.0, 1.0, (sin252 + 1) / 2, (cos252 + 1) / 2, // E4
+		// 0.0,    g, -1.0, 1.0, 1.0, 1.0, (sin324 + 1) / 2, (cos324 + 1) / 2, // A0
 
-		 // Fan
-		   g, -1.0,  0.0, 1.0, 1.0, 1.0, 0.5, 0.5, // K
-		   g,  1.0,  0.0, 1.0, 1.0, 1.0, 0.5, 1.0, // I
-		 1.0,  0.0,   -g, 1.0, 1.0, 1.0, (sin72 + 1) / 2, (cos72 + 1) / 2, // J
-		 0.0,   -g, -1.0, 1.0, 1.0, 1.0, (sin144 + 1) / 2, (cos144 + 1) / 2, // G
-		 0.0,   -g,  1.0, 1.0, 1.0, 1.0, (sin252 + 1) / 2, (sin252 + 1) / 2, // H
-		 1.0,  0.0,    g, 1.0, 1.0, 1.0, (sin324 + 1) / 2, (cos324 + 1) / 2, // L
-		   g,  1.0,  0.0, 1.0, 1.0, 1.0, 0.5, 1.0, // I
+		// // Fan
+		//   g, -1.0,  0.0, 1.0, 1.0, 1.0, 0.5, 0.5, // K10
+		//   g,  1.0,  0.0, 1.0, 1.0, 1.0, 0.5, 1.0, // I8
+		// 1.0,  0.0,   -g, 1.0, 1.0, 1.0, (sin72 + 1) / 2, (cos72 + 1) / 2, // J9
+		// 0.0,   -g, -1.0, 1.0, 1.0, 1.0, (sin144 + 1) / 2, (cos144 + 1) / 2, // G6
+		// 0.0,   -g,  1.0, 1.0, 1.0, 1.0, (sin252 + 1) / 2, (sin252 + 1) / 2, // H7
+		// 1.0,  0.0,    g, 1.0, 1.0, 1.0, (sin324 + 1) / 2, (cos324 + 1) / 2, // L11
+		//   g,  1.0,  0.0, 1.0, 1.0, 1.0, 0.5, 1.0, // I8
 
-		   // Strip
-		   0.0,    g, -1.0, 1.0, 1.0, 1.0, (sin324 + 1) / 2, (cos324 + 1) / 2, // A
-			 g,  1.0,  0.0, 1.0, 1.0, 1.0, 0.5, 1.0, // I
-		   0.0,    g,  1.0, 1.0, 1.0, 1.0, (sin36 + 1) / 2, (cos36 + 1) / 2, // B
-		   1.0,  0.0,    g, 1.0, 1.0, 1.0, (sin324 + 1) / 2, (cos324 + 1) / 2, // L
-		  -1.0,  0.0,    g, 1.0, 1.0, 1.0, (sin108 + 1) / 2, (cos108 + 1) / 2, // C
-		   0.0,   -g,  1.0, 1.0, 1.0, 1.0, (sin252 + 1) / 2, (sin252 + 1) / 2, // H
-			-g, -1.0,  0.0, 1.0, 1.0, 1.0, 0.5, 0.0, // D
-		   0.0,   -g, -1.0, 1.0, 1.0, 1.0, (sin144 + 1) / 2, (cos144 + 1) / 2, // G
-		  -1.0,  0.0,   -g, 1.0, 1.0, 1.0, (sin252 + 1) / 2, (cos252 + 1) / 2, // E
-		   1.0,  0.0,   -g, 1.0, 1.0, 1.0, (sin72 + 1) / 2, (cos72 + 1) / 2, // J
-		   0.0,    g, -1.0, 1.0, 1.0, 1.0, (sin324 + 1) / 2, (cos324 + 1) / 2, // A
-			 g,  1.0,  0.0, 1.0, 1.0, 1.0, 0.5, 1.0, // I
+		//   // Strip
+		//   0.0,    g, -1.0, 1.0, 1.0, 1.0, (sin324 + 1) / 2, (cos324 + 1) / 2, // A0
+		//	 g,  1.0,  0.0, 1.0, 1.0, 1.0, 0.5, 1.0, // I8
+		//   0.0,    g,  1.0, 1.0, 1.0, 1.0, (sin36 + 1) / 2, (cos36 + 1) / 2, // B1
+		//   1.0,  0.0,    g, 1.0, 1.0, 1.0, (sin324 + 1) / 2, (cos324 + 1) / 2, // L11
+		//  -1.0,  0.0,    g, 1.0, 1.0, 1.0, (sin108 + 1) / 2, (cos108 + 1) / 2, // C2
+		//   0.0,   -g,  1.0, 1.0, 1.0, 1.0, (sin252 + 1) / 2, (sin252 + 1) / 2, // H7
+		//	-g, -1.0,  0.0, 1.0, 1.0, 1.0, 0.5, 0.0, // D3
+		//   0.0,   -g, -1.0, 1.0, 1.0, 1.0, (sin144 + 1) / 2, (cos144 + 1) / 2, // G6
+		//  -1.0,  0.0,   -g, 1.0, 1.0, 1.0, (sin252 + 1) / 2, (cos252 + 1) / 2, // E4
+		//   1.0,  0.0,   -g, 1.0, 1.0, 1.0, (sin72 + 1) / 2, (cos72 + 1) / 2, // J9
+		//   0.0,    g, -1.0, 1.0, 1.0, 1.0, (sin324 + 1) / 2, (cos324 + 1) / 2, // A0
+		//	 g,  1.0,  0.0, 1.0, 1.0, 1.0, 0.5, 1.0, // I
+
+	0.0, g, -1.0, 1.0, 1.0, 1.0, (sin324 + 1) / 2, (cos324 + 1) / 2, // A
+	0.0, g, 1.0, 1.0, 1.0, 1.0, (sin36 + 1) / 2, (cos36 + 1) / 2, // B
+	-1.0, 0.0, g, 1.0, 1.0, 1.0, (sin108 + 1) / 2, (cos108 + 1) / 2, // C
+	-g, -1.0, 0.0, 1.0, 1.0, 1.0, 0.5, 0.0, // D
+	-1.0, 0.0, -g, 1.0, 1.0, 1.0, (sin252 + 1) / 2, (cos252 + 1) / 2, // E
+	-g, 1.0, 0.0, 1.0, 1.0, 1.0, 0.5, 0.5, // F
+	0.0, -g, -1.0, 1.0, 1.0, 1.0, (sin144 + 1) / 2, (cos144 + 1) / 2, // G
+	0.0, -g, 1.0, 1.0, 1.0, 1.0, (sin252 + 1) / 2, (sin252 + 1) / 2, // H
+	g, 1.0, 0.0, 1.0, 1.0, 1.0, 0.5, 1.0, // I
+	1.0, 0.0, -g, 1.0, 1.0, 1.0, (sin72 + 1) / 2, (cos72 + 1) / 2, // J
+	g, -1.0, 0.0, 1.0, 1.0, 1.0, 0.5, 0.5, // K
+	1.0, 0.0, g, 1.0, 1.0, 1.0, (sin324 + 1) / 2, (cos324 + 1) / 2, // L
 	};
 
-
-
+	// Use indices here
+	unsigned int indices[] = {
+		 5,  0,  1,  2,  3,  4,  0, // Fan
+		10,  8,  9,  6,  7, 11,  8, // Fan
+		 0,  8,  1, 11,  2,  7,  3, 6, 4, 9, 0, 8 // Strip
+	};
 
 	glm::vec3 cubePositions[] = {
 	glm::vec3(0.0f,  0.0f,  0.0f),
@@ -170,7 +187,7 @@ int main2(int argc, char* argv[]) {
 	// load texture
 	int width, height, numChannels;
 	stbi_set_flip_vertically_on_load(true);
-	unsigned char* textureData = stbi_load("face.png", &width, &height, &numChannels, 0);
+	unsigned char* textureData = stbi_load("originalface.jpg", &width, &height, &numChannels, 0);
 
 	if (!textureData) {
 		printf("Oh no! Couldn't load texture file!\n");
@@ -185,7 +202,7 @@ int main2(int argc, char* argv[]) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, numChannels == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, textureData);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, numChannels == 4 ? GL_RGB : GL_RGB, GL_UNSIGNED_BYTE, textureData);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	stbi_image_free(textureData);
 
@@ -214,7 +231,7 @@ int main2(int argc, char* argv[]) {
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 	
-	for (int i = 0; i < 26; i++) {
+	for (int i = 0; i < 12; i++) {
 		icosahedron[i * 8 + 0] *= 0.25;
 		icosahedron[i * 8 + 1] *= 0.25;
 		icosahedron[i * 8 + 2] *= 0.25;
@@ -224,6 +241,11 @@ int main2(int argc, char* argv[]) {
 	unsigned int VAO;
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
+
+	unsigned int EBO;
+	glGenBuffers(1, &EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	// position attribute
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
@@ -288,12 +310,10 @@ int main2(int argc, char* argv[]) {
 			spin = glm::rotate(spin, glm::radians(elapsedTime * -180), glm::vec3(1.0, 0.0, 0.0));
 			spin = glm::rotate(spin, glm::radians(elapsedTime * 45), glm::vec3(0.0, 1.0, 0.0));
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(spin));
-			//glDrawArrays(GL_TRIANGLES, 0, 36);
-			glDrawArrays(GL_TRIANGLE_FAN, 0, 7);
-			glDrawArrays(GL_TRIANGLE_FAN, 7, 7);
-			glDrawArrays(GL_TRIANGLE_STRIP, 14, 12);
 
-			;
+			glDrawElements(GL_TRIANGLE_FAN, 7, GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_TRIANGLE_FAN, 7, GL_UNSIGNED_INT, (void *)(7 * sizeof(unsigned int)));
+			glDrawElements(GL_TRIANGLE_STRIP, 12, GL_UNSIGNED_INT, (void *)(14 * sizeof(unsigned int)));
 		}
 
 		glfwSwapBuffers(window);
