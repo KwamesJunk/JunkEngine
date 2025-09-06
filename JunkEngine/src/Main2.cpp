@@ -11,10 +11,18 @@
 // Prototypes
 static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 static void processInput(GLFWwindow* window, double deltaTime);
+static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
+static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+static double clamp(double value, double min, double max);
 
 static const float PI = 3.1415962f;
 static int SCR_WIDTH = 800;
 static int SCR_HEIGHT = 600;
+static double prevMouseX, prevMouseY;
+static double yaw = 270, pitch = 0;
+static float fov = 45;
+glm::mat4 projection;
+
 
 static glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 static glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
@@ -51,9 +59,15 @@ int main2(int argc, char* argv[]) {
 	glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+	glfwGetCursorPos(window, &prevMouseX, &prevMouseY);
+	mouseCallback(window, prevMouseX, prevMouseY);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPosCallback(window, mouseCallback);
+
+	glfwSetScrollCallback(window, scrollCallback);
+
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
-	float g = 1.6180339887f;
 	// Vertex data
 	float vertices[] = {
 		-0.5f, -0.5f, -0.5f,  1.0, 1.0, 1.0, 0.0f, 0.0f,
@@ -99,69 +113,25 @@ int main2(int argc, char* argv[]) {
 		-0.5f,  0.5f, -0.5f,  1.0, 1.0, 1.0, 0.0f, 1.0f
 	};
 
-	//  0.0,    g, -1.0, 1.0, 1.0, 1.0, 0.0, 0.0, // A 
-	//  0.0,    g,  1.0, 1.0, 1.0, 1.0, 0.0, 0.0, // B
-	// -1.0,  0.0,    g, 1.0, 1.0, 1.0, 0.0, 0.0, // C
-	//   -g, -1.0,  0.0, 1.0, 1.0, 1.0, 0.0, 0.0, // D
-	// -1.0,  0.0,   -g, 1.0, 1.0, 1.0, 0.0, 0.0, // E
-	//   -g,  1.0,  0.0, 1.0, 1.0, 1.0, 0.0, 0.0, // F
-	//  0.0,   -g, -1.0, 1.0, 1.0, 1.0, 0.0, 0.0, // G
-	//  0.0,   -g,  1.0, 1.0, 1.0, 1.0, 0.0, 0.0, // H
-	//    g,  1.0,  0.0, 1.0, 1.0, 1.0, 0.0, 0.0, // I
-	//  1.0,  0.0,   -g, 1.0, 1.0, 1.0, 0.0, 0.0,  // J
-	//    g, -1.0,  0.0, 1.0, 1.0, 1.0, 0.0, 0.0,  // K
-	//  1.0,  0.0,    g, 1.0, 1.0, 1.0, 0.0, 0.0,  // L
-
+	float g = 1.6180339887f;
 	float sin36 = 0.5878, sin108 = 0.9510, sin252 = -0.9510, sin324 = -0.5878;
 	float cos36 = 0.8090, cos108 = -0.3090, cos252 = -0.3090, cos324 = 0.8090;
 
 	float sin72 = 0.9510, sin144 = 0.5878, sin216 = -0.5878, sin288 = -0.9510;
 	float cos72 = 0.3090, cos144 = -0.8090, cos216 = -0.8090, cos288 = 0.3090;
 	float icosahedron[] = {
-		//// Fan
-		//  -g,  1.0,  0.0, 1.0, 1.0, 1.0, 0.5, 0.5, // F5
-		// 0.0,    g, -1.0, 1.0, 1.0, 1.0, (sin324 + 1) / 2, (cos324 + 1) / 2, // A0
-		// 0.0,    g,  1.0, 1.0, 1.0, 1.0, (sin36 + 1) / 2, (cos36 + 1) / 2, // B1
-		//-1.0,  0.0,    g, 1.0, 1.0, 1.0, (sin108 + 1) / 2, (cos108 + 1) / 2, // C2
-		//  -g, -1.0,  0.0, 1.0, 1.0, 1.0, 0.5, 0.0, // D3
-		//-1.0,  0.0,   -g, 1.0, 1.0, 1.0, (sin252 + 1) / 2, (cos252 + 1) / 2, // E4
-		// 0.0,    g, -1.0, 1.0, 1.0, 1.0, (sin324 + 1) / 2, (cos324 + 1) / 2, // A0
-
-		// // Fan
-		//   g, -1.0,  0.0, 1.0, 1.0, 1.0, 0.5, 0.5, // K10
-		//   g,  1.0,  0.0, 1.0, 1.0, 1.0, 0.5, 1.0, // I8
-		// 1.0,  0.0,   -g, 1.0, 1.0, 1.0, (sin72 + 1) / 2, (cos72 + 1) / 2, // J9
-		// 0.0,   -g, -1.0, 1.0, 1.0, 1.0, (sin144 + 1) / 2, (cos144 + 1) / 2, // G6
-		// 0.0,   -g,  1.0, 1.0, 1.0, 1.0, (sin252 + 1) / 2, (sin252 + 1) / 2, // H7
-		// 1.0,  0.0,    g, 1.0, 1.0, 1.0, (sin324 + 1) / 2, (cos324 + 1) / 2, // L11
-		//   g,  1.0,  0.0, 1.0, 1.0, 1.0, 0.5, 1.0, // I8
-
-		//   // Strip
-		//   0.0,    g, -1.0, 1.0, 1.0, 1.0, (sin324 + 1) / 2, (cos324 + 1) / 2, // A0
-		//	 g,  1.0,  0.0, 1.0, 1.0, 1.0, 0.5, 1.0, // I8
-		//   0.0,    g,  1.0, 1.0, 1.0, 1.0, (sin36 + 1) / 2, (cos36 + 1) / 2, // B1
-		//   1.0,  0.0,    g, 1.0, 1.0, 1.0, (sin324 + 1) / 2, (cos324 + 1) / 2, // L11
-		//  -1.0,  0.0,    g, 1.0, 1.0, 1.0, (sin108 + 1) / 2, (cos108 + 1) / 2, // C2
-		//   0.0,   -g,  1.0, 1.0, 1.0, 1.0, (sin252 + 1) / 2, (sin252 + 1) / 2, // H7
-		//	-g, -1.0,  0.0, 1.0, 1.0, 1.0, 0.5, 0.0, // D3
-		//   0.0,   -g, -1.0, 1.0, 1.0, 1.0, (sin144 + 1) / 2, (cos144 + 1) / 2, // G6
-		//  -1.0,  0.0,   -g, 1.0, 1.0, 1.0, (sin252 + 1) / 2, (cos252 + 1) / 2, // E4
-		//   1.0,  0.0,   -g, 1.0, 1.0, 1.0, (sin72 + 1) / 2, (cos72 + 1) / 2, // J9
-		//   0.0,    g, -1.0, 1.0, 1.0, 1.0, (sin324 + 1) / 2, (cos324 + 1) / 2, // A0
-		//	 g,  1.0,  0.0, 1.0, 1.0, 1.0, 0.5, 1.0, // I
-
-	0.0, g, -1.0, 1.0, 1.0, 1.0, (sin324 + 1) / 2, (cos324 + 1) / 2, // A
-	0.0, g, 1.0, 1.0, 1.0, 1.0, (sin36 + 1) / 2, (cos36 + 1) / 2, // B
-	-1.0, 0.0, g, 1.0, 1.0, 1.0, (sin108 + 1) / 2, (cos108 + 1) / 2, // C
-	-g, -1.0, 0.0, 1.0, 1.0, 1.0, 0.5, 0.0, // D
-	-1.0, 0.0, -g, 1.0, 1.0, 1.0, (sin252 + 1) / 2, (cos252 + 1) / 2, // E
-	-g, 1.0, 0.0, 1.0, 1.0, 1.0, 0.5, 0.5, // F
-	0.0, -g, -1.0, 1.0, 1.0, 1.0, (sin144 + 1) / 2, (cos144 + 1) / 2, // G
-	0.0, -g, 1.0, 1.0, 1.0, 1.0, (sin252 + 1) / 2, (sin252 + 1) / 2, // H
-	g, 1.0, 0.0, 1.0, 1.0, 1.0, 0.5, 1.0, // I
-	1.0, 0.0, -g, 1.0, 1.0, 1.0, (sin72 + 1) / 2, (cos72 + 1) / 2, // J
-	g, -1.0, 0.0, 1.0, 1.0, 1.0, 0.5, 0.5, // K
-	1.0, 0.0, g, 1.0, 1.0, 1.0, (sin324 + 1) / 2, (cos324 + 1) / 2, // L
+		 0.0,    g, -1.0, 1.0, 1.0, 1.0, (sin324 + 1) / 2, (cos324 + 1) / 2, // A
+		 0.0,    g,  1.0, 1.0, 1.0, 1.0, (sin36 + 1) / 2, (cos36 + 1) / 2,   // B
+		-1.0,  0.0,    g, 1.0, 1.0, 1.0, (sin108 + 1) / 2, (cos108 + 1) / 2, // C
+		  -g, -1.0,  0.0, 1.0, 1.0, 1.0, 0.5, 0.0,                           // D
+		-1.0,  0.0,   -g, 1.0, 1.0, 1.0, (sin252 + 1) / 2, (cos252 + 1) / 2, // E
+		  -g,  1.0,  0.0, 1.0, 1.0, 1.0, 0.5, 0.5,                           // F
+		 0.0,   -g, -1.0, 1.0, 1.0, 1.0, (sin144 + 1) / 2, (cos144 + 1) / 2, // G
+		 0.0,   -g,  1.0, 1.0, 1.0, 1.0, (sin252 + 1) / 2, (sin252 + 1) / 2, // H
+		   g,  1.0,  0.0, 1.0, 1.0, 1.0, 0.5, 1.0,                           // I
+		 1.0,  0.0,   -g, 1.0, 1.0, 1.0, (sin72 + 1) / 2, (cos72 + 1) / 2,   // J
+		   g, -1.0,  0.0, 1.0, 1.0, 1.0, 0.5, 0.5,                           // K
+		 1.0,  0.0,    g, 1.0, 1.0, 1.0, (sin324 + 1) / 2, (cos324 + 1) / 2, // L
 	};
 
 	// Use indices here
@@ -281,7 +251,7 @@ int main2(int argc, char* argv[]) {
 	unsigned int projectionLoc = glGetUniformLocation(shader.getShaderID(), "projection");
 
 	glm::mat4 view = glm::translate(identity, glm::vec3(0.0f, 0.0f, -3.0f));
-	glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+	projection = glm::perspective(glm::radians(fov), 800.0f / 600.0f, 0.1f, 100.0f);
 
 	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
@@ -304,6 +274,7 @@ int main2(int argc, char* argv[]) {
 		const float radius = 10.0f;
 		view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
 		for (int i = 0; i < 10; i++) {
 			spin = glm::translate(identity, cubePositions[i]);
@@ -347,4 +318,50 @@ static void processInput(GLFWwindow* window, double deltaTime)
 		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+}
+
+static void mouseCallback(GLFWwindow* window, double xpos, double ypos) {
+	//printf("prev: (%f, %f) new: (%f, %f)\n", prevMouseX, prevMouseY, xpos, ypos);
+	//printf("yaw: %f deg\n", yaw);
+
+	double xoffset = xpos - prevMouseX;
+	double yoffset = prevMouseY - ypos; // reversed since y-coordinates range from bottom to top
+	prevMouseX = xpos;
+	prevMouseY = ypos;
+
+	const float sensitivity = 0.1f;
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
+
+	pitch = clamp(pitch + yoffset, -89, 89);
+	yaw += xoffset;
+	
+	glm::vec3 direction;
+	direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	direction.y = sin(glm::radians(pitch));
+	direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	cameraFront = glm::normalize(direction);
+}
+
+static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	fov = clamp(fov - (float)yoffset, 1.0f, 45.0f);
+	
+	//fov -= (float)yoffset;
+	//
+	//
+	//
+	//if (fov < 1.0f)
+	//	fov = 1.0f;
+	//if (fov > 45.0f)
+	//	fov = 45.0f;
+
+
+	projection = glm::perspective(glm::radians(fov), 800.0f / 600.0f, 0.1f, 100.0f);
+}
+
+static double clamp(double value, double min, double max) {
+	if (value < min) return min;
+	if (value > max) return max;
+	return value;
 }
